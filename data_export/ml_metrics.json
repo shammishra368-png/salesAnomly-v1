@@ -1,0 +1,11 @@
+{
+  "sql_precision": 4.6,
+  "sql_recall": 75.0,
+  "sql_f1": 8.7,
+  "sql_flagged": 130,
+  "ml_precision": 6.9,
+  "ml_recall": 75.0,
+  "ml_f1": 12.6,
+  "ml_flagged": 87,
+  "total_records": 1080
+}

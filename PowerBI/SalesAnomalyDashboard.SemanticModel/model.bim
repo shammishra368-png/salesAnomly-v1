@@ -1,0 +1,169 @@
+{
+  "name": "SalesAnomalyDashboard",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "tables": [
+      {
+        "name": "sales_inventory_anomalies",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id", "summarizeBy": "none" },
+          { "name": "record_date", "dataType": "string", "sourceColumn": "record_date", "summarizeBy": "none" },
+          { "name": "item", "dataType": "string", "sourceColumn": "item", "summarizeBy": "none" },
+          { "name": "sales", "dataType": "int64", "sourceColumn": "sales", "summarizeBy": "sum" },
+          { "name": "inventory", "dataType": "int64", "sourceColumn": "inventory", "summarizeBy": "sum" },
+          { "name": "unit_price", "dataType": "double", "sourceColumn": "unit_price", "summarizeBy": "average" },
+          { "name": "revenue", "dataType": "double", "sourceColumn": "revenue", "summarizeBy": "sum" },
+          { "name": "stock_value", "dataType": "double", "sourceColumn": "stock_value", "summarizeBy": "sum" },
+          { "name": "is_injected_anomaly", "dataType": "int64", "sourceColumn": "is_injected_anomaly", "summarizeBy": "none" },
+          { "name": "rolling_mean", "dataType": "double", "sourceColumn": "rolling_mean", "summarizeBy": "none" },
+          { "name": "rolling_std", "dataType": "double", "sourceColumn": "rolling_std", "summarizeBy": "none" },
+          { "name": "z_score", "dataType": "double", "sourceColumn": "z_score", "summarizeBy": "none" },
+          { "name": "inv_rolling_mean", "dataType": "double", "sourceColumn": "inv_rolling_mean", "summarizeBy": "none" },
+          { "name": "inv_rolling_std", "dataType": "double", "sourceColumn": "inv_rolling_std", "summarizeBy": "none" },
+          { "name": "inv_z_score", "dataType": "double", "sourceColumn": "inv_z_score", "summarizeBy": "none" },
+          { "name": "anomaly_type", "dataType": "string", "sourceColumn": "anomaly_type", "summarizeBy": "none" },
+          { "name": "is_flagged", "dataType": "int64", "sourceColumn": "is_flagged", "summarizeBy": "sum" },
+          { "name": "severity", "dataType": "string", "sourceColumn": "severity", "summarizeBy": "none" },
+          { "name": "financial_impact", "dataType": "double", "sourceColumn": "financial_impact", "summarizeBy": "sum" }
+        ],
+        "partitions": [
+          {
+            "name": "sales_inventory_anomalies",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(\"C:\\project\\data_export\\sales_inventory_anomalies.csv\"), [Delimiter=\",\", Columns=19, Encoding=65001, QuoteStyle=QuoteStyle.None]),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    ChangedType = Table.TransformColumnTypes(PromotedHeaders, {",
+                "        {\"id\", Int64.Type},",
+                "        {\"record_date\", type text},",
+                "        {\"item\", type text},",
+                "        {\"sales\", Int64.Type},",
+                "        {\"inventory\", Int64.Type},",
+                "        {\"unit_price\", type number},",
+                "        {\"revenue\", type number},",
+                "        {\"stock_value\", type number},",
+                "        {\"is_injected_anomaly\", Int64.Type},",
+                "        {\"rolling_mean\", type number},",
+                "        {\"rolling_std\", type number},",
+                "        {\"z_score\", type number},",
+                "        {\"inv_rolling_mean\", type number},",
+                "        {\"inv_rolling_std\", type number},",
+                "        {\"inv_z_score\", type number},",
+                "        {\"anomaly_type\", type text},",
+                "        {\"is_flagged\", Int64.Type},",
+                "        {\"severity\", type text},",
+                "        {\"financial_impact\", type number}",
+                "    })",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Records",
+            "expression": "COUNTROWS(sales_inventory_anomalies)"
+          },
+          {
+            "name": "Total Anomalies",
+            "expression": "SUM(sales_inventory_anomalies[is_flagged])"
+          },
+          {
+            "name": "Anomaly Rate %",
+            "expression": "DIVIDE([Total Anomalies], [Total Records], 0) * 100",
+            "formatString": "0.00\"%\""
+          },
+          {
+            "name": "Total Revenue",
+            "expression": "SUM(sales_inventory_anomalies[revenue])",
+            "formatString": "₹#,##0.00"
+          },
+          {
+            "name": "Net Financial Impact",
+            "expression": "SUM(sales_inventory_anomalies[financial_impact])",
+            "formatString": "₹#,##0.00"
+          },
+          {
+            "name": "Critical Anomalies",
+            "expression": "CALCULATE(COUNTROWS(sales_inventory_anomalies), sales_inventory_anomalies[severity] = \"CRITICAL\")"
+          },
+          {
+            "name": "Warning Anomalies",
+            "expression": "CALCULATE(COUNTROWS(sales_inventory_anomalies), sales_inventory_anomalies[severity] = \"WARNING\")"
+          },
+          {
+            "name": "Avg Abs Z-Score (Flagged)",
+            "expression": "CALCULATE(AVERAGE(sales_inventory_anomalies[z_score]), sales_inventory_anomalies[is_flagged] = 1)"
+          }
+        ]
+      },
+      {
+        "name": "anomaly_summary",
+        "columns": [
+          { "name": "item", "dataType": "string", "sourceColumn": "item", "summarizeBy": "none" },
+          { "name": "total_records", "dataType": "int64", "sourceColumn": "total_records", "summarizeBy": "sum" },
+          { "name": "total_revenue", "dataType": "double", "sourceColumn": "total_revenue", "summarizeBy": "sum" },
+          { "name": "avg_daily_sales", "dataType": "double", "sourceColumn": "avg_daily_sales", "summarizeBy": "average" },
+          { "name": "avg_inventory", "dataType": "double", "sourceColumn": "avg_inventory", "summarizeBy": "average" },
+          { "name": "total_anomalies", "dataType": "int64", "sourceColumn": "total_anomalies", "summarizeBy": "sum" },
+          { "name": "critical_anomalies", "dataType": "int64", "sourceColumn": "critical_anomalies", "summarizeBy": "sum" },
+          { "name": "warning_anomalies", "dataType": "int64", "sourceColumn": "warning_anomalies", "summarizeBy": "sum" },
+          { "name": "sales_spikes", "dataType": "int64", "sourceColumn": "sales_spikes", "summarizeBy": "sum" },
+          { "name": "sales_drops", "dataType": "int64", "sourceColumn": "sales_drops", "summarizeBy": "sum" },
+          { "name": "stockouts", "dataType": "int64", "sourceColumn": "stockouts", "summarizeBy": "sum" },
+          { "name": "shrinkages", "dataType": "int64", "sourceColumn": "shrinkages", "summarizeBy": "sum" },
+          { "name": "total_financial_impact", "dataType": "double", "sourceColumn": "total_financial_impact", "summarizeBy": "sum" },
+          { "name": "anomaly_rate_pct", "dataType": "double", "sourceColumn": "anomaly_rate_pct", "summarizeBy": "average" }
+        ],
+        "partitions": [
+          {
+            "name": "anomaly_summary",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(\"C:\\project\\data_export\\anomaly_summary.csv\"), [Delimiter=\",\", Columns=14, Encoding=65001, QuoteStyle=QuoteStyle.None]),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    ChangedType = Table.TransformColumnTypes(PromotedHeaders, {",
+                "        {\"item\", type text},",
+                "        {\"total_records\", Int64.Type},",
+                "        {\"total_revenue\", type number},",
+                "        {\"avg_daily_sales\", type number},",
+                "        {\"avg_inventory\", type number},",
+                "        {\"total_anomalies\", Int64.Type},",
+                "        {\"critical_anomalies\", Int64.Type},",
+                "        {\"warning_anomalies\", Int64.Type},",
+                "        {\"sales_spikes\", Int64.Type},",
+                "        {\"sales_drops\", Int64.Type},",
+                "        {\"stockouts\", Int64.Type},",
+                "        {\"shrinkages\", Int64.Type},",
+                "        {\"total_financial_impact\", type number},",
+                "        {\"anomaly_rate_pct\", type number}",
+                "    })",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"sales_inventory_anomalies\",\"anomaly_summary\"]"
+      }
+    ]
+  }
+}

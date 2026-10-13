@@ -1,0 +1,61 @@
+================================================================================
+POWER BI DAX MEASURES CHEAT SHEET
+Sales & Inventory Anomaly Detection Dashboard
+================================================================================
+
+1. Total Records:
+   Total Records = COUNTROWS(sales_inventory_anomalies)
+
+2. Total Anomalies Detected:
+   Total Anomalies = SUM(sales_inventory_anomalies[is_flagged])
+
+3. Anomaly Rate (%):
+   Anomaly Rate % = 
+   DIVIDE([Total Anomalies], [Total Records], 0)
+   (Format as Percentage: 0.00%)
+
+4. Total Revenue:
+   Total Revenue = SUM(sales_inventory_anomalies[revenue])
+   (Format as Currency: ₹#,##0.00)
+
+5. Net Financial Anomaly Impact:
+   Net Financial Impact = SUM(sales_inventory_anomalies[financial_impact])
+   (Format as Currency: ₹#,##0.00)
+
+6. Critical Anomalies Count:
+   Critical Anomalies = 
+   CALCULATE(
+       COUNTROWS(sales_inventory_anomalies),
+       sales_inventory_anomalies[severity] = "CRITICAL"
+   )
+
+7. Warning Anomalies Count:
+   Warning Anomalies = 
+   CALCULATE(
+       COUNTROWS(sales_inventory_anomalies),
+       sales_inventory_anomalies[severity] = "WARNING"
+   )
+
+8. Inventory Stockout Alerts:
+   Stockout Events = 
+   CALCULATE(
+       COUNTROWS(sales_inventory_anomalies),
+       sales_inventory_anomalies[anomaly_type] = "Inventory Stockout"
+   )
+
+9. Dynamic Color Formatting for Table & Matrix:
+   Severity_Color = 
+   SWITCH(
+       SELECTEDVALUE(sales_inventory_anomalies[severity]),
+       "CRITICAL", "#EF4444", -- Vivid Red
+       "WARNING", "#F59E0B",  -- Amber / Orange
+       "#10B981"              -- Emerald Green
+   )
+
+10. Average |Z-Score| of Flagged Anomalies:
+    Avg Anomaly Z-Score = 
+    CALCULATE(
+        AVERAGE(sales_inventory_anomalies[z_score]),
+        sales_inventory_anomalies[is_flagged] = 1
+    )
+================================================================================

@@ -1,0 +1,9 @@
+# requirements.txt
+# ----------------
+# Python dependencies for the Sales & Inventory Anomaly Detection project.
+# SQLite is built into Python's standard library — no extra driver needed.
+#
+# Install with:  pip install -r requirements.txt
+
+# No external packages required — the project uses only the Python standard library:
+#   sqlite3, csv, os, time, random, argparse, datetime
