@@ -359,8 +359,8 @@ async def main():
     print("=" * 72)
 
     if not args.no_browser and
-       os.environ.get("RENDER","").lower() != "true":
-  webbrowser.open(dashboard_url)
+    os.environ.get("RENDER","").lower() != "true":
+       webbrowser.open(dashboard_url)
 
     try:
         while True:
