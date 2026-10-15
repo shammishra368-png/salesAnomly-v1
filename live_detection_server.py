@@ -357,9 +357,10 @@ async def main():
     print(f"  * Engine State:       {'STREAMING' if manager.is_streaming else 'PAUSED'}")
     print("  Press Ctrl+C to stop the server at any time.")
     print("=" * 72)
+    
     if not args.no_browser and
-os.environ.get("RENDER","")!="true":
-  webbrowser.open(dashboard_url)
+  os.environ.get("RENDER","")!="true":
+    webbrowser.open(dashboard_url)
 
     try:
         while True:
