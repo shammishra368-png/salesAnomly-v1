@@ -358,9 +358,8 @@ async def main():
     print("  Press Ctrl+C to stop the server at any time.")
     print("=" * 72)
     
-    if not args.no_browser and
-  os.environ.get("RENDER","")!="true":
-    webbrowser.open(dashboard_url)
+    if not args.no_browser and os.environ.get("RENDER","")!="true":
+      webbrowser.open(dashboard_url)
 
     try:
         while True:
