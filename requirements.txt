@@ -9,4 +9,4 @@
 #   sqlite3, csv, os, time, random, argparse, datetime
 aiohttp
 pandas
-sklearn
+scikit-learn
